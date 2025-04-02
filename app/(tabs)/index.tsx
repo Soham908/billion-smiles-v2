@@ -1,74 +1,123 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const HomePage = () => {
+    return (
+        <View style={styles.container}>
+            {/* Row 1: User Details */}
+            <View style={styles.userDetailsRow}>
+                <Image
+                    source={{ uri: 'https://placehold.co/60' }}
+                    style={styles.profileImage}
+                />
+                <Text style={styles.username}>Username</Text>
+                <Image
+                    source={{ uri: 'https://placehold.co/40' }}
+                    style={styles.badgeImage}
+                />
+                <Image
+                    source={{ uri: 'https://placehold.co/40' }}
+                    style={styles.badgeImage}
+                />
+                <TouchableOpacity>
+                    <MaterialIcons name='more-vert' size={24} />
+                </TouchableOpacity>
+            </View>
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
-}
+            {/* Row 2: Post Image */}
+            <View style={styles.imageRow}>
+                <Image
+                    source={{ uri: 'https://placehold.co/300x200' }}
+                    style={styles.postImage}
+                />
+            </View>
+
+            {/* Row 3: Caption and Comments */}
+            <View style={styles.captionRow}>
+                <View style={{ flexDirection: 'row', gap: 15 }}>
+                <TouchableOpacity>
+                    <MaterialIcons name='favorite-outline' size={24} />
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <MaterialIcons name='chat-bubble-outline' size={24} />
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <MaterialIcons name='send' size={24} />
+                </TouchableOpacity>
+                </View>
+                <Text style={styles.caption}>
+                    This is a caption with #hashtags.
+                </Text>
+                <Text style={styles.description}>
+                    This is a description of the post.
+                </Text>
+                <Text style={styles.comments}>View all comments</Text>
+            </View>
+        </View>
+    );
+};
+
+export default HomePage;
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingVertical: 10,
+    },
+    userDetailsRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        marginBottom: 10,
+    },
+    profileImage: {
+        width: 60,
+        height: 60,
+        borderRadius: 60,
+        marginRight: 10,
+    },
+    badgeImage: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 2,
+    },
+    username: {
+        flex: 1,
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    menuIcon: {
+        fontSize: 20,
+        color: '#888',
+    },
+    imageRow: {
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    postImage: {
+        width: '100%',
+        height: 300,
+        resizeMode: 'cover',
+    },
+    captionRow: {
+        paddingHorizontal: 12,
+    },
+    caption: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        marginTop: 10
+    },
+    description: {
+        fontSize: 14,
+        color: '#555',
+        marginBottom: 5,
+    },
+    comments: {
+        fontSize: 12,
+        color: '#888',
+    },
 });
