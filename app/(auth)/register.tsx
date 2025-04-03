@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native';
-import { Link } from 'expo-router'; 
+import { Link } from 'expo-router'; // Import the Link component from expo-router
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Handle login action here
-    console.log('User logined:', { name, email, password });
+  const handleRegister = () => {
+    // Handle register action here
+    console.log('User registered:', { name, email, password });
   };
 
   return (
@@ -19,7 +19,7 @@ const LoginPage = () => {
     >
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.container}>
-          <Text style={styles.heading}>Login into your Account</Text>
+          <Text style={styles.heading}>Create an Account</Text>
 
           {/* Name Input */}
           <TextInput
@@ -27,6 +27,15 @@ const LoginPage = () => {
             placeholder="Username"
             value={name}
             onChangeText={setName}
+          />
+
+          {/* Email Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Email Address"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
           />
 
           {/* Password Input */}
@@ -38,14 +47,14 @@ const LoginPage = () => {
             secureTextEntry
           />
 
-          {/* login Button */}
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Login</Text>
+          {/* Register Button */}
+          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+            <Text style={styles.registerButtonText}>Register</Text>
           </TouchableOpacity>
 
           {/* Already have an account link */}
-          <Link href="/register" style={styles.loginLink}>
-            <Text style={styles.loginLinkText}>Don't have an account ? Register</Text>
+          <Link href="/login" style={styles.loginLink}>
+            <Text style={styles.loginLinkText}>Already have an account? Login</Text>
           </Link>
 
           {/* Social Media Signup */}
@@ -55,7 +64,7 @@ const LoginPage = () => {
                 source={require('@/assets/images/icons8-google3.png')}
                 style={styles.socialIcon}
               />
-              <Text style={styles.socialButtonText}>Login with Google</Text>
+              <Text style={styles.socialButtonText}>Register with Google</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -93,7 +102,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     color: '#333',
   },
-  loginButton: {
+  registerButton: {
     width: '60%',
     height: 48,
     justifyContent: 'center',
@@ -103,7 +112,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
   },
-  loginButtonText: {
+  registerButtonText: {
     fontSize: 18,
     fontWeight: '500',
   },
@@ -148,4 +157,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginPage;
+export default RegisterPage;

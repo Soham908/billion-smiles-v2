@@ -1,59 +1,32 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import React from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
+import HomePageCard from '@/components/homepage-card';
+import { Link } from 'expo-router';
 
 const HomePage = () => {
     return (
         <View style={styles.container}>
-            {/* Row 1: User Details */}
-            <View style={styles.userDetailsRow}>
-                <Image
-                    source={{ uri: 'https://placehold.co/60' }}
-                    style={styles.profileImage}
-                />
-                <Text style={styles.username}>Username</Text>
-                <Image
-                    source={{ uri: 'https://placehold.co/40' }}
-                    style={styles.badgeImage}
-                />
-                <Image
-                    source={{ uri: 'https://placehold.co/40' }}
-                    style={styles.badgeImage}
-                />
-                <TouchableOpacity>
-                    <MaterialIcons name='more-vert' size={24} />
+        <View style={styles.appbar}>
+                <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>Billion Smiles</Text>
+                <TouchableOpacity style={{ margin: 10 }}>
+                    <MaterialIcons name='add' size={24} />
                 </TouchableOpacity>
+                <TouchableOpacity style={{ margin: 0 }}>
+                    <MaterialIcons name='menu' size={24} />
+                </TouchableOpacity>
+                <Link href={'/register'}>Signup</Link>
             </View>
 
-            {/* Row 2: Post Image */}
-            <View style={styles.imageRow}>
-                <Image
-                    source={{ uri: 'https://placehold.co/300x200' }}
-                    style={styles.postImage}
-                />
-            </View>
+            <FlatList
+                data={[1, 2, 3, 4, 5, 6]}
+                renderItem={() => {
+                    return (
+                        <HomePageCard />
+                    )
+                }}
+            />
 
-            {/* Row 3: Caption and Comments */}
-            <View style={styles.captionRow}>
-                <View style={{ flexDirection: 'row', gap: 15 }}>
-                <TouchableOpacity>
-                    <MaterialIcons name='favorite-outline' size={24} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <MaterialIcons name='chat-bubble-outline' size={24} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <MaterialIcons name='send' size={24} />
-                </TouchableOpacity>
-                </View>
-                <Text style={styles.caption}>
-                    This is a caption with #hashtags.
-                </Text>
-                <Text style={styles.description}>
-                    This is a description of the post.
-                </Text>
-                <Text style={styles.comments}>View all comments</Text>
-            </View>
         </View>
     );
 };
@@ -66,58 +39,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         paddingVertical: 10,
     },
-    userDetailsRow: {
+    appbar: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 10,
+        paddingHorizontal: 16,
         marginBottom: 10,
-    },
-    profileImage: {
-        width: 60,
-        height: 60,
-        borderRadius: 60,
-        marginRight: 10,
-    },
-    badgeImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        marginRight: 2,
-    },
-    username: {
-        flex: 1,
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    menuIcon: {
-        fontSize: 20,
-        color: '#888',
-    },
-    imageRow: {
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    postImage: {
-        width: '100%',
-        height: 300,
-        resizeMode: 'cover',
-    },
-    captionRow: {
-        paddingHorizontal: 12,
-    },
-    caption: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        marginBottom: 5,
-        marginTop: 10
-    },
-    description: {
-        fontSize: 14,
-        color: '#555',
-        marginBottom: 5,
-    },
-    comments: {
-        fontSize: 12,
-        color: '#888',
     },
 });
