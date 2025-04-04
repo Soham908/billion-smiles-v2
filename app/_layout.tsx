@@ -9,8 +9,10 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
         <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)/signup" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)/preferences" options={{ headerShown: false }} />
+
+        <Stack.Screen name="(screens)/create-post" options={{ headerShown: false }} />
       </Stack>
     </SafeAreaView>
   );

@@ -2,20 +2,24 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react
 import React from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import HomePageCard from '@/components/homepage-card';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
+import { useUserStore } from '@/store/storeUser';
 
 const HomePage = () => {
+    const router = useRouter()
+    const { userData } = useUserStore()
+console.log(userData)
     return (
         <View style={styles.container}>
         <View style={styles.appbar}>
                 <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>Billion Smiles</Text>
-                <TouchableOpacity style={{ margin: 10 }}>
+                <TouchableOpacity style={{ margin: 10 }} onPress={() => router.push("/create-post")}>
                     <MaterialIcons name='add' size={24} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ margin: 0 }}>
                     <MaterialIcons name='menu' size={24} />
                 </TouchableOpacity>
-                <Link href={'/register'}>Signup</Link>
+                <Link href={'/signup'}>Signup</Link>
             </View>
 
             <FlatList

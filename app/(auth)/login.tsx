@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native';
-import { Link } from 'expo-router'; 
+import { Link, useRouter } from 'expo-router';
+import { userLoginHandler } from '@/api-handlers/authHandler';
+import { useUserStore } from '@/store/storeUser';
 
 const LoginPage = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('Soham');
+  const [password, setPassword] = useState('Soham');
+  const { setUserData } = useUserStore()
+  const router = useRouter()
 
-  const handleLogin = () => {
-    // Handle login action here
-    console.log('User logined:', { name, email, password });
+
+  const handleLogin = async () => {
+    if (username !== "" && password !== "") {
+      const loginResponse = await userLoginHandler(username, password)
+      if (loginResponse.success) {
+        setUserData(loginResponse.userData)
+        router.replace("/")
+      }
+    }
   };
 
   return (
@@ -25,8 +34,8 @@ const LoginPage = () => {
           <TextInput
             style={styles.input}
             placeholder="Username"
-            value={name}
-            onChangeText={setName}
+            value={username}
+            onChangeText={setUsername}
           />
 
           {/* Password Input */}
@@ -44,7 +53,7 @@ const LoginPage = () => {
           </TouchableOpacity>
 
           {/* Already have an account link */}
-          <Link href="/register" style={styles.loginLink}>
+          <Link href="/signup" style={styles.loginLink}>
             <Text style={styles.loginLinkText}>Don't have an account ? Register</Text>
           </Link>
 

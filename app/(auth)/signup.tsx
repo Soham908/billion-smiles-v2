@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native';
-import { Link } from 'expo-router'; // Import the Link component from expo-router
+import { Link, useRouter } from 'expo-router'; // Import the Link component from expo-router
+import { userSignupHandler } from '@/api-handlers/authHandler';
 
-const RegisterPage = () => {
-  const [name, setName] = useState('');
+const SignupPage = () => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter()
 
-  const handleRegister = () => {
-    // Handle register action here
-    console.log('User registered:', { name, email, password });
+
+  const handleSignup = async () => {
+    if (username !== "" && password !== "" && email !== "") {
+      const signupResponse = await userSignupHandler(username, password, email)
+      if (signupResponse.success) {
+        router.replace("/")
+      }
+    }
   };
 
   return (
@@ -25,8 +32,8 @@ const RegisterPage = () => {
           <TextInput
             style={styles.input}
             placeholder="Username"
-            value={name}
-            onChangeText={setName}
+            value={username}
+            onChangeText={setUsername}
           />
 
           {/* Email Input */}
@@ -48,8 +55,8 @@ const RegisterPage = () => {
           />
 
           {/* Register Button */}
-          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-            <Text style={styles.registerButtonText}>Register</Text>
+          <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
+            <Text style={styles.signupButtonText}>Signup</Text>
           </TouchableOpacity>
 
           {/* Already have an account link */}
@@ -64,7 +71,7 @@ const RegisterPage = () => {
                 source={require('@/assets/images/icons8-google3.png')}
                 style={styles.socialIcon}
               />
-              <Text style={styles.socialButtonText}>Register with Google</Text>
+              <Text style={styles.socialButtonText}>Signup with Google</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -102,7 +109,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     color: '#333',
   },
-  registerButton: {
+  signupButton: {
     width: '60%',
     height: 48,
     justifyContent: 'center',
@@ -112,7 +119,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
   },
-  registerButtonText: {
+  signupButtonText: {
     fontSize: 18,
     fontWeight: '500',
   },
@@ -157,4 +164,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegisterPage;
+export default SignupPage;
