@@ -1,15 +1,19 @@
+import { useUserStore } from '@/store/storeUser';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 
 const ProfileHeader = () => {
-    // Combine all header sections (user details, description, supports, badges, stats)
-    // Replace the following with your actual header JSX (based on your previous code)
+    
+    const { userData } = useUserStore()
+    const router = useRouter()
+
     return (
         <View style={styles.headerContainer}>
             <View style={styles.appbar}>
-                <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>Username</Text>
-                <TouchableOpacity style={{ margin: 10 }}>
+                <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>{ userData.username || "Username" }</Text>
+                <TouchableOpacity style={{ margin: 10 }} onPress={() => router.push("/create-post")}>
                     <MaterialIcons name='add' size={24} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ margin: 0 }}>
@@ -21,7 +25,7 @@ const ProfileHeader = () => {
             {/* User Detail Section */}
             <View style={styles.userDetailSection}>
                 <View style={styles.leftColumn}>
-                    <Image source={{ uri: 'https://placehold.co/100' }} style={styles.profileImage} />
+                    <Image source={require("@/assets/images/user.png")} style={styles.profileImage} />
                 </View>
                 <View style={styles.rightColumn}>
                     <View style={styles.statsRow}>
@@ -47,7 +51,7 @@ const ProfileHeader = () => {
 
             {/* User Description Section */}
             <View style={styles.userDescriptionSection}>
-                <Text style={styles.username}>Username</Text>
+                <Text style={styles.username}>{ userData.username || "Username" }</Text>
                 <Text style={styles.description}>Passionate about making a difference. Helping animals, supporting education, and more.</Text>
                 <Text style={styles.sectionTitle}>Supports</Text>
                 <View style={styles.supportsContainer}>
@@ -147,8 +151,6 @@ const styles = StyleSheet.create({
         width: 90,
         height: 90,
         borderRadius: 45,
-        borderWidth: 2,
-        borderColor: '#4A90E2',
     },
     // Styles for posts grid remain the same
     postsContainer: {

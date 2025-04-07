@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, TextInput, KeyboardAvoidingView, Keyboard, Platform, ScrollView, Pressable } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker"
 import { useUserStore } from '@/store/storeUser';
@@ -32,19 +32,19 @@ const CreatePost = () => {
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ["images"],
-          quality: 1,
-          base64: true,
+            mediaTypes: ["images"],
+            quality: 1,
+            base64: true,
         });
-    
-        if (!result.canceled) {
-          setSelectedImageURI(result.assets[0].uri);
-          let base64Img = `data:${result.assets[0].mimeType};base64,${result.assets[0].base64}`;
-          setUploadUri(base64Img);
-        }
-      };
 
-      const uploadPost = async () => {
+        if (!result.canceled) {
+            setSelectedImageURI(result.assets[0].uri);
+            let base64Img = `data:${result.assets[0].mimeType};base64,${result.assets[0].base64}`;
+            setUploadUri(base64Img);
+        }
+    };
+
+    const uploadPost = async () => {
         setDisableButton(true);
         const postDetails = { userId: userData._id, imageUrl: "", caption: caption }
         const response = await createPostHandler(postDetails, uploadUri);
@@ -54,77 +54,82 @@ const CreatePost = () => {
         // }
         setDisableButton(false);
         router.replace("/");
-      };
+    };
 
     return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-            <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                <View style={styles.container}>
-                    {/* Image Picker Section */}
-                    <TouchableOpacity style={styles.imagePickerContainer} onPress={pickImage}>
-                        {selectedImageURI ? (
-                            <Image source={{ uri: selectedImageURI }} style={styles.selectedImage} />
-                        ) : (
-                            <View style={styles.placeholder}>
-                                <Ionicons name="image-outline" size={50} color="#ccc" />
-                                <Text style={styles.placeholderText}>Select an Image</Text>
-                            </View>
-                        )}
-                    </TouchableOpacity>
+        <ScrollView style={styles.container}>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                <Pressable onPress={() => Keyboard.dismiss()}>
+                    <View style={styles.container}>
+                        {/* Image Picker Section */}
+                        <TouchableOpacity style={styles.imagePickerContainer} onPress={pickImage}>
+                            {selectedImageURI ? (
+                                <Image source={{ uri: selectedImageURI }} style={styles.selectedImage} />
+                            ) : (
+                                <View style={styles.placeholder}>
+                                    <Ionicons name="image-outline" size={50} color="#ccc" />
+                                    <Text style={styles.placeholderText}>Select an Image</Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
 
-                    {/* Caption Input */}
-                    <Text style={styles.sectionTitle}>Captions</Text>
-                    <View style={styles.captionContainer}>
-                        <TextInput
-                            style={styles.captionInput}
-                            placeholder="Write a caption..."
-                            placeholderTextColor="#888"
-                            multiline
-                            value={caption}
-                            onChangeText={setCaption}
-                        />
+                        {/* Caption Input */}
+                        <Text style={styles.sectionTitle}>Captions</Text>
+                        <View style={styles.captionContainer}>
+                            <TextInput
+                                style={styles.captionInput}
+                                placeholder="Write a caption..."
+                                placeholderTextColor="#888"
+                                multiline
+                                value={caption}
+                                onChangeText={setCaption}
+                            />
+                        </View>
+
+                        {/* Recommended Campaigns */}
+                        <View style={styles.sectionContainer}>
+                            <Text style={styles.sectionTitle}>Recommended Campaigns</Text>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                <View style={styles.columnsContainer}>
+                                    {columns.map((column, colIndex) => (
+                                        <View key={colIndex} style={styles.column}>
+                                            {column.map((item) => (
+                                                <TouchableOpacity key={item.id} style={styles.campaignCard}>
+                                                    <Text style={styles.campaignTitle}>{item.campaignTitle}</Text>
+                                                    <View style={styles.campaignDetailSection}>
+                                                        <MaterialIcons name="apartment" size={24} />
+                                                        <Text style={styles.campaignText}>{item.companyName}</Text>
+                                                    </View>
+                                                    <View style={styles.campaignDetailSection}>
+                                                        <MaterialIcons name="location-on" size={24} />
+                                                        <Text style={styles.campaignText}>{item.location}</Text>
+
+
+                                                        <MaterialIcons name="volunteer-activism" size={24} />
+                                                        <Text style={styles.campaignText}>{item.causeName}</Text>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
+                                    ))}
+                                </View>
+                            </ScrollView>
+                        </View>
+
+                        {/* Upload Post Button */}
+                        <TouchableOpacity style={[
+                            styles.uploadButton,
+                            disableButton ? styles.disabledButton : null
+                        ]} onPress={() => uploadPost()} disabled={disableButton}>
+                            <Text style={styles.uploadButtonText}>Upload Post</Text>
+                        </TouchableOpacity>
                     </View>
-
-                    {/* Recommended Campaigns */}
-                    <View style={styles.sectionContainer}>
-                        <Text style={styles.sectionTitle}>Recommended Campaigns</Text>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                            <View style={styles.columnsContainer}>
-                                {columns.map((column, colIndex) => (
-                                    <View key={colIndex} style={styles.column}>
-                                        {column.map((item) => (
-                                            <TouchableOpacity key={item.id} style={styles.campaignCard}>
-                                                <Text style={styles.campaignTitle}>{item.campaignTitle}</Text>
-                                                <View style={styles.campaignDetailSection}>
-                                                    <MaterialIcons name="apartment" size={24} />
-                                                    <Text style={styles.campaignText}>{item.companyName}</Text>
-                                                </View>
-                                                <View style={styles.campaignDetailSection}>
-                                                    <MaterialIcons name="location-on" size={24} />
-                                                    <Text style={styles.campaignText}>{item.location}</Text>
-                                                
-                                                
-                                                    <MaterialIcons name="volunteer-activism" size={24} />
-                                                    <Text style={styles.campaignText}>{item.causeName}</Text>
-                                                </View>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </View>
-                                ))}
-                            </View>
-                        </ScrollView>
-                    </View>
-
-                    {/* Upload Post Button */}
-                    <TouchableOpacity style={styles.uploadButton} onPress={() => uploadPost()}>
-                        <Text style={styles.uploadButtonText}>Upload Post</Text>
-                    </TouchableOpacity>
-                </View>
-            </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
+                </Pressable>
+            </KeyboardAvoidingView>
+        </ScrollView>
     );
 };
 
@@ -224,6 +229,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#FFF',
         fontWeight: '600',
+    },
+    disabledButton: {
+        backgroundColor: '#ccc',
+        opacity: 0.6,
     },
 });
 
