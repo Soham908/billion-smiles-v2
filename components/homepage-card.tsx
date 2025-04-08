@@ -3,7 +3,6 @@ import React, { useRef, useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { IPost } from '@/types/typePost'
 import { GestureHandlerGestureEvent, GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler'
-import Menu from './homepage-menu'
 
 const HomePageCard = ({ postData }: { postData: IPost }) => {
     const [postLiked, setPostLiked] = useState(false)
@@ -50,26 +49,9 @@ const HomePageCard = ({ postData }: { postData: IPost }) => {
             else triggerHeartAnimation();
         }
     };
-    const [isMenuVisible, setMenuVisible] = useState(false);
-
-    const handleSettings = () => {
-      console.log('Settings clicked');
-      setMenuVisible(false);
-    };
-  
-    const handleLogout = () => {
-      console.log('Logout clicked');
-      setMenuVisible(false);
-    };
 
     return (
         <View style={{ marginBottom: 32 }} >{/* Row 1: User Details */}
-                  <Menu
-        isVisible={isMenuVisible}
-        onClose={() => setMenuVisible(false)}
-        onSettings={handleSettings}
-        onLogout={handleLogout}
-      />
             <View style={styles.userDetailsRow}>
                 <Image
                     source={require("@/assets/images/user.png")}
@@ -84,7 +66,7 @@ const HomePageCard = ({ postData }: { postData: IPost }) => {
                     source={{ uri: 'https://placehold.co/40' }}
                     style={styles.badgeImage}
                 />
-                <TouchableOpacity onPress={() => setMenuVisible(true)} >
+                <TouchableOpacity>
                     <MaterialIcons name='more-vert' size={24} />
                 </TouchableOpacity>
             </View>
@@ -223,8 +205,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: '50%',
         left: '50%',
-        marginLeft: -25, // Center the heart
-        zIndex: 999, // Make sure the heart is on top of everything
+        marginLeft: -25,
+        zIndex: 2,
     },
     heartIcon: {
         backgroundColor: 'transparent',

@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, RefreshControl, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, RefreshControl, TouchableWithoutFeedback, Pressable } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import HomePageCard from '@/components/homepage-card';
 import { Link, useRouter } from 'expo-router';
-import { useUserStore } from '@/store/storeUser';
+import { useUserStore } from '@/store/userStore';
 import { fetchAllPostHandler } from '@/api-handlers/postHandler';
 import { IPost } from '@/types/typePost';
 
@@ -29,9 +29,12 @@ const HomePage = () => {
     }
     const [menuVisible, setMenuVisible] = useState(false);
 
+    const handleOutsideClick = async () => {
+        if (menuVisible) { setMenuVisible(false); console.log("clicked: " + menuVisible) }
+    }
 
     return (
-        <View style={styles.container}>
+        <Pressable style={styles.container} onPress={handleOutsideClick}>
             <View style={styles.appbar}>
                 <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>Billion Smiles</Text>
                 <TouchableOpacity style={{ margin: 10 }} onPress={() => router.push("/create-post")}>
@@ -40,7 +43,6 @@ const HomePage = () => {
                 <TouchableOpacity style={{ margin: 0 }} onPress={() => setMenuVisible(true)} >
                     <MaterialIcons name='menu' size={24} />
                 </TouchableOpacity>
-                <Link href={'/signup'}>Signup</Link>
             </View>
 
             <FlatList
@@ -59,23 +61,26 @@ const HomePage = () => {
                 }
             />
 
-{menuVisible && (
-    <View style={styles.menuContainer}>
-        <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/settings')}>
-            <Text style={styles.menuText}>Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={() => {
-            // Handle logout logic
-            useUserStore.getState().logout();
-            router.push('/login');
-        }}>
-            <Text style={styles.menuText}>Logout</Text>
-        </TouchableOpacity>
-    </View>
-)}
+            {menuVisible && (
+                <View style={styles.menuContainer}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => { router.push('/settings'); setMenuVisible(false) }}>
+                        <Text style={styles.menuText}>Settings</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => {
+                        // Handle logout logic
+                        console.log(userData)
+                        useUserStore.getState().logoutUser();
+                        console.log(userData)
+                        router.push('/login');
+                        setMenuVisible(false)
+                    }}>
+                        <Text style={styles.menuText}>Logout</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
 
 
-        </View>
+        </Pressable>
     );
 };
 
@@ -92,7 +97,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.3)', // Dimmed background
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-      },
+    },
     appbar: {
         flexDirection: 'row',
         alignItems: 'center',

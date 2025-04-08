@@ -1,6 +1,7 @@
-import { useUserStore } from '@/store/storeUser';
+import { usePostStore } from '@/store/postStore';
+import { useUserStore } from '@/store/userStore';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 
@@ -91,40 +92,36 @@ const ProfileHeader = () => {
     );
 };
 
+const ProfileFooter = () => {
+    return(
+        <View style={styles.profileFooterSection}>
+            <Text style={styles.footerTitle}>
+                Create more posts
+            </Text>
+            <TouchableOpacity style={{ alignContent:'center', justifyContent: 'center', marginStart: 12 }} onPress={() => router.push("/create-post")}>
+                <MaterialIcons name='add' size={28} />
+            </TouchableOpacity>
+        </View>
+    )
+}
+
 const ProfilePage = () => {
-    const postsData = [
-        { id: '1', image: 'https://placehold.co/300' },
-        { id: '2', image: 'https://placehold.co/301' },
-        { id: '3', image: 'https://placehold.co/302' },
-        { id: '32', image: 'https://placehold.co/302' },
-        { id: '3222', image: 'https://placehold.co/302' },
-        { id: '311', image: 'https://placehold.co/302' },
-        { id: '333123', image: 'https://placehold.co/302' },
-        { id: '323123123', image: 'https://placehold.co/302' },
-        { id: '3111111', image: 'https://placehold.co/302' },
-        { id: '36', image: 'https://placehold.co/302' },
-        { id: '34', image: 'https://placehold.co/302' },
-        { id: '83', image: 'https://placehold.co/302' },
-        { id: '361', image: 'https://placehold.co/302' },
-        { id: '341', image: 'https://placehold.co/302' },
-        { id: '831', image: 'https://placehold.co/302' },
-        { id: '831', image: 'https://placehold.co/302' },
-        { id: '831212', image: 'https://placehold.co/302' },
-        // ... more posts
-    ];
+
+    const { userPosts } = usePostStore()
 
     return (
         <FlatList
-            data={postsData}
-            keyExtractor={(item) => item.id.toString()}
+            data={userPosts}
+            keyExtractor={(item) => item._id.toString()}
             numColumns={3}
             renderItem={({ item }) => (
                 <TouchableOpacity style={styles.postItem}>
-                    <Image source={{ uri: item.image }} style={styles.postImage} />
+                    <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
                 </TouchableOpacity>
             )}
             contentContainerStyle={styles.postsContainer}
             ListHeaderComponent={<ProfileHeader />}
+            ListFooterComponent={<ProfileFooter />}
         />
     );
 };
@@ -292,6 +289,17 @@ const styles = StyleSheet.create({
     statLabel: {
         fontSize: 12,
         color: '#666',
+    },
+    profileFooterSection: {
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        flexDirection: 'row'
+    },
+    footerTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        marginVertical: 8,
+        color: '#333',
     },
 });
 

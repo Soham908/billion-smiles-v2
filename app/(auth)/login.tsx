@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { userLoginHandler } from '@/api-handlers/authHandler';
-import { useUserStore } from '@/store/storeUser';
+import { useUserStore } from '@/store/userStore';
 
 const LoginPage = () => {
     const [username, setUsername] = useState('Demo');

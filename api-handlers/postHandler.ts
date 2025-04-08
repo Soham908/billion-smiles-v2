@@ -10,7 +10,7 @@ interface IFetchAllPosts {
 }
 
 export const fetchAllPostHandler = async (): Promise<IFetchAllPosts> => {
-    const response = await axios.get(url + "/fetch-all-user-post")
+    const response = await axios.get(url + "/fetch-all-posts")
     const { success, message, allPosts } = response.data
     return { success: success, message: message, allPosts: allPosts }
 }

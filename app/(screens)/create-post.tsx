@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, TextInput, KeyboardAvoidingView, Keyboard, Platform, ScrollView, Pressable } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker"
-import { useUserStore } from '@/store/storeUser';
+import { useUserStore } from '@/store/userStore';
 import { createPostHandler } from '@/api-handlers/uploadPostHandler';
 import { useRouter } from 'expo-router';
 
