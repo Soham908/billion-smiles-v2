@@ -14,7 +14,7 @@ const LoginPage = () => {
     const handleLogin = async () => {
         if (username !== "" && password !== "") {
             const loginResponse = await userLoginHandler(username, password)
-            if (loginResponse.success) {
+            if (loginResponse.success && loginResponse.userData) {
                 setUserData(loginResponse.userData)
                 router.replace("/")
             }

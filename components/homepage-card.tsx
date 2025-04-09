@@ -1,12 +1,15 @@
 import { Animated, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { IPost } from '@/types/typePost'
 import { GestureHandlerGestureEvent, GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler'
+import { IUser } from '@/types/typeUser'
+import { likePostHandler } from '@/api-handlers/postHandler'
 
-const HomePageCard = ({ postData }: { postData: IPost }) => {
-    const [postLiked, setPostLiked] = useState(false)
+const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser }) => {
     const [heartVisible, setHeartVisible] = useState(false);
+    const [isPostLiked, setIsPostLiked] = useState(false)
+    const [likesCounter, setLikesCounter] = useState(0)
     const scale = useRef(new Animated.Value(1)).current;
     const heartPosition = useRef(new Animated.Value(0)).current;
 
@@ -41,14 +44,24 @@ const HomePageCard = ({ postData }: { postData: IPost }) => {
             setHeartVisible(false);
         }, 600);
     };
-    const onDoubleTapEvent = (event: GestureHandlerGestureEvent) => {
+    const onDoubleTapEvent = async (event: GestureHandlerGestureEvent) => {
         if (event.nativeEvent.state === State.ACTIVE) {
-            setPostLiked(prev => !prev)
-            console.log(postLiked)
-            if (postLiked) console.log('remove like')
-            else triggerHeartAnimation();
+            setIsPostLiked(prev => !prev)
+            
+            if (isPostLiked) setLikesCounter(prev => prev - 1);
+            else { triggerHeartAnimation(); setLikesCounter(prev => prev + 1) }
+
+            if (userData._id) {
+                const response = await likePostHandler(userData._id, userData.username, postData._id)
+            }
         }
     };
+
+    useEffect(() => {
+        const hasLiked = postData.likedBy.some(like => like.userId === userData._id);
+        setIsPostLiked(hasLiked);
+        setLikesCounter(postData.likes)
+    }, [postData])
 
     return (
         <View style={{ marginBottom: 32 }} >{/* Row 1: User Details */}
@@ -110,9 +123,12 @@ const HomePageCard = ({ postData }: { postData: IPost }) => {
             {/* Row 3: Caption and Comments */}
             <View style={styles.captionRow}>
                 <View style={{ flexDirection: 'row', gap: 15 }}>
-                    <TouchableOpacity onPress={() => setPostLiked(prev => !prev)} >
-                        <MaterialIcons name={postLiked ? 'favorite' : 'favorite-outline'} color={postLiked ? 'red' : 'black'} size={24} />
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity onPress={() => setIsPostLiked(prev => !prev)} >
+                            <MaterialIcons name={isPostLiked ? 'favorite' : 'favorite-outline'} color={isPostLiked ? 'red' : 'black'} size={24} />
+                        </TouchableOpacity>
+                        <Text style={{ alignContent: 'center', marginLeft: 4 }}>{likesCounter}</Text>
+                    </View>
                     <TouchableOpacity>
                         <MaterialIcons name='chat-bubble-outline' size={24} />
                     </TouchableOpacity>
@@ -132,7 +148,6 @@ const HomePageCard = ({ postData }: { postData: IPost }) => {
                 <Text style={styles.comments}>View all comments</Text>
             </View>
 
-  
 
         </View>
     )

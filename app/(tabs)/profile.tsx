@@ -108,7 +108,7 @@ const ProfileFooter = () => {
 const ProfilePage = () => {
 
     const { userPosts } = usePostStore()
-
+    userPosts.map((post) => console.log(post.caption))
     return (
         <FlatList
             data={userPosts}

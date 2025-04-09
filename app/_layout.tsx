@@ -1,36 +1,49 @@
 import { fetchUserDataHandler } from "@/api-handlers/authHandler";
 import { usePostStore } from "@/store/postStore";
 import { useUserStore } from "@/store/userStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
 import { SafeAreaView, StatusBar } from "react-native";
 
 export default function RootLayout() {
-  const { userData } = useUserStore()
-  const { setUserPosts } = usePostStore()
+    const { userData, setUserData } = useUserStore()
+    const { setUserPosts } = usePostStore()
 
-  useEffect(() => {
     const fetchUserData = async () => {
-      const response = await fetchUserDataHandler(userData._id)
-      console.log(response)
-      response.userPosts && setUserPosts(response.userPosts)
+        const response = await fetchUserDataHandler(userData._id)
+        console.log(response)
+        if (response.success && response.userData && response.userPosts) {
+            setUserData(response.userData)
+            setUserPosts(response.userPosts)
+        }
     }
-    fetchUserData()
-  }, [])
+    
+    const checkUserAuth = async () => {
+        const storedData = await AsyncStorage.getItem("billion-smiles-user-data-v2");
+        const userData = storedData ? JSON.parse(storedData) : null;
+        if (userData && userData.state?.isAuthenticated) {
+            fetchUserData();
+        }
+    };
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar barStyle={"dark-content"} />
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    useEffect(() => {
+        checkUserAuth()
+    }, [])
 
-        <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)/signup" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)/preferences" options={{ headerShown: false }} />
+    return (
+        <SafeAreaView style={{ flex: 1 }}>
+            <StatusBar barStyle={"dark-content"} />
+            <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        <Stack.Screen name="(screens)/create-post" options={{ headerShown: false }} />
-        <Stack.Screen name="(screens)/settings" options={{ headerShown: false }} />
-      </Stack>
-    </SafeAreaView>
-  );
+                <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)/signup" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)/preferences" options={{ headerShown: false }} />
+
+                <Stack.Screen name="(screens)/create-post" options={{ headerShown: false }} />
+                <Stack.Screen name="(screens)/settings" options={{ headerShown: false }} />
+            </Stack>
+        </SafeAreaView>
+    );
 }

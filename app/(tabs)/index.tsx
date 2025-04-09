@@ -9,7 +9,7 @@ import { IPost } from '@/types/typePost';
 
 const HomePage = () => {
     const router = useRouter()
-    const { userData } = useUserStore()
+    const userData = useUserStore(state => state.userData)
     const [allPosts, setAllPosts] = useState<IPost[]>()
     const [refreshing, setRefreshing] = useState(false)
 
@@ -49,7 +49,7 @@ const HomePage = () => {
                 data={allPosts}
                 renderItem={({ item }: { item: IPost }) => {
                     return (
-                        <HomePageCard postData={item} />
+                        <HomePageCard postData={item} userData={userData} />
                     )
                 }}
                 refreshControl={
@@ -67,10 +67,7 @@ const HomePage = () => {
                         <Text style={styles.menuText}>Settings</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.menuItem} onPress={() => {
-                        // Handle logout logic
-                        console.log(userData)
                         useUserStore.getState().logoutUser();
-                        console.log(userData)
                         router.push('/login');
                         setMenuVisible(false)
                     }}>

@@ -21,7 +21,7 @@ export const useUserStore = create(
       logoutUser: () => set({ isAuthenticated: false, userData: {} as IUser, isUserCausePreferenceSet: false }),
     }),
     {
-      name: "billion-smiles-user-auth-v2",
+      name: "billion-smiles-user-data-v2",
       storage: createJSONStorage(() => AsyncStorage)
     }
   )
