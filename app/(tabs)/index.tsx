@@ -1,83 +1,116 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, RefreshControl, TouchableWithoutFeedback, Pressable } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, RefreshControl, Modal, TouchableWithoutFeedback } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import HomePageCard from '@/components/homepage-card';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useUserStore } from '@/store/userStore';
 import { fetchAllPostHandler } from '@/api-handlers/postHandler';
 import { IPost } from '@/types/typePost';
 
 const HomePage = () => {
-    const router = useRouter()
-    const userData = useUserStore(state => state.userData)
-    const [allPosts, setAllPosts] = useState<IPost[]>()
-    const [refreshing, setRefreshing] = useState(false)
-console.log("homepage loaded")
+    const router = useRouter();
+    const userData = useUserStore((state) => state.userData);
+    const [allPosts, setAllPosts] = useState<IPost[]>();
+    const [refreshing, setRefreshing] = useState(false);
+    const [menuVisible, setMenuVisible] = useState(false);
+    const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0, height: 0 });
+    const menuButtonRef = useRef(null);
+
     useEffect(() => {
         const fetchAllPosts = async () => {
-            const posts = await fetchAllPostHandler()
-            console.log(posts)
-            setAllPosts(posts.allPosts)
-        }
-        fetchAllPosts()
-    }, [])
+            const posts = await fetchAllPostHandler();
+            setAllPosts(posts.allPosts);
+        };
+        fetchAllPosts();
+    }, []);
 
     const handleRefresh = async () => {
-        const posts = await fetchAllPostHandler()
-        console.log(posts)
-        setAllPosts(posts.allPosts)
-    }
-    const [menuVisible, setMenuVisible] = useState(false);
+        const posts = await fetchAllPostHandler();
+        setAllPosts(posts.allPosts);
+    };
 
-    const handleOutsideClick = async () => {
-        if (menuVisible) { setMenuVisible(false); console.log("clicked: " + menuVisible) }
-    }
+    const handleOutsideClick = () => {
+        if (menuVisible) {
+            setMenuVisible(false);
+        }
+    };
+
+    const handleMenuButtonLayout = (event) => {
+        const { x, y, height } = event.nativeEvent.layout;
+        setMenuPosition({ x, y, height });
+    };
 
     return (
-        <Pressable style={styles.container} onPress={handleOutsideClick}>
+        <View style={styles.container}>
             <View style={styles.appbar}>
-                <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>Billion Smiles</Text>
+                <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>App Name</Text>
                 <TouchableOpacity style={{ margin: 10 }} onPress={() => router.push("/create-post")}>
-                    <MaterialIcons name='add' size={24} />
+                    <MaterialIcons name="add" size={24} />
                 </TouchableOpacity>
-                <TouchableOpacity style={{ margin: 0 }} onPress={() => setMenuVisible(true)} >
-                    <MaterialIcons name='menu' size={24} />
+                <TouchableOpacity
+                    ref={menuButtonRef}
+                    style={{ margin: 0 }}
+                    onPress={() => setMenuVisible(!menuVisible)}
+                    onLayout={handleMenuButtonLayout}
+                >
+                    <MaterialIcons name="menu" size={24} />
                 </TouchableOpacity>
             </View>
 
             <FlatList
                 data={allPosts}
                 renderItem={({ item }: { item: IPost }) => {
-                    return (
-                        <HomePageCard postData={item} userData={userData} />
-                    )
+                    return <HomePageCard postData={item} userData={userData} />;
                 }}
                 refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={handleRefresh}
-                        colors={["#1E90FF"]}
-                    />
+                    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={["#1E90FF"]} />
                 }
             />
 
             {menuVisible && (
-                <View style={styles.menuContainer}>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => { router.push('/settings'); setMenuVisible(false) }}>
-                        <Text style={styles.menuText}>Settings</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => {
-                        useUserStore.getState().logoutUser();
-                        router.push('/login');
-                        setMenuVisible(false)
-                    }}>
-                        <Text style={styles.menuText}>Logout</Text>
-                    </TouchableOpacity>
-                </View>
+                <Modal
+                    visible={menuVisible}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={handleOutsideClick}
+                >
+                    <TouchableWithoutFeedback onPress={handleOutsideClick}>
+                        <View style={styles.overlay}>
+                            <View
+                                style={[
+                                    styles.menuContainer,
+                                    {
+                                        top: menuPosition.y + menuPosition.height + 12, // Position below the button
+                                        left: menuPosition.x - 48, // Align with the left of the button
+                                    },
+                                ]}
+                            >
+                                <TouchableOpacity
+                                    style={styles.menuItem}
+                                    onPress={() => {
+                                        router.push('/settings');
+                                        setMenuVisible(false);
+                                    }}
+                                >
+                                    <Text style={styles.menuText}>Settings</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.menuItem}
+                                    onPress={() => {
+                                        useUserStore.getState().logoutUser();
+                                        router.push('/login');
+                                        setMenuVisible(false);
+                                    }}
+                                >
+                                    <Text style={styles.menuText}>Logout</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </Modal>
             )}
 
-
-        </Pressable>
+        </View>
     );
 };
 
@@ -87,13 +120,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        paddingVertical: 10,
+        paddingTop: 10,
     },
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Dimmed background
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Dimmed background
     },
     appbar: {
         flexDirection: 'row',
@@ -103,8 +136,6 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         position: 'absolute',
-        top: 50,
-        right: 16,
         backgroundColor: '#fff',
         borderRadius: 8,
         shadowColor: '#000',

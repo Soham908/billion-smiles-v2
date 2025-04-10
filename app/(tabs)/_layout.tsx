@@ -14,6 +14,7 @@ const TabLayout = () => {
             headerTintColor: "#fff",
             tabBarStyle: {
               backgroundColor: "#000000",
+              borderTopWidth: 0
             },
           }}
         >

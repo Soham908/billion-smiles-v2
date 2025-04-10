@@ -2,7 +2,7 @@ import { Animated, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } 
 import React, { useEffect, useRef, useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { IPost } from '@/types/typePost'
-import { GestureHandlerGestureEvent, GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler'
+import { GestureHandlerGestureEvent, State, TapGestureHandler } from 'react-native-gesture-handler'
 import { IUser } from '@/types/typeUser'
 import { likePostHandler } from '@/api-handlers/postHandler'
 
@@ -47,7 +47,7 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
     const onDoubleTapEvent = async (event: GestureHandlerGestureEvent) => {
         if (event.nativeEvent.state === State.ACTIVE) {
             setIsPostLiked(prev => !prev)
-            
+
             if (isPostLiked) setLikesCounter(prev => prev - 1);
             else { triggerHeartAnimation(); setLikesCounter(prev => prev + 1) }
 
@@ -85,17 +85,14 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
             </View>
 
             {/* Row 2: Post Image */}
-            <GestureHandlerRootView>
-                <TapGestureHandler onHandlerStateChange={onDoubleTapEvent} numberOfTaps={2}>
-
-                    <Pressable style={styles.imageRow}>
-                        <Image
-                            source={{ uri: postData.imageUrl }}
-                            style={styles.postImage}
-                        />
-                    </Pressable>
-                </TapGestureHandler>
-            </GestureHandlerRootView>
+            <TapGestureHandler onHandlerStateChange={onDoubleTapEvent} numberOfTaps={2}>
+                <Pressable style={styles.imageRow}>
+                    <Image
+                        source={{ uri: postData.imageUrl }}
+                        style={styles.postImage}
+                    />
+                </Pressable>
+            </TapGestureHandler>
 
             {heartVisible && (
                 <Animated.View
