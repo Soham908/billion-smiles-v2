@@ -12,7 +12,7 @@ const HomePage = () => {
     const userData = useUserStore(state => state.userData)
     const [allPosts, setAllPosts] = useState<IPost[]>()
     const [refreshing, setRefreshing] = useState(false)
-
+console.log("homepage loaded")
     useEffect(() => {
         const fetchAllPosts = async () => {
             const posts = await fetchAllPostHandler()

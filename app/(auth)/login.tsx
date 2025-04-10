@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Keyboard, K
 import { Link, useRouter } from 'expo-router';
 import { userLoginHandler } from '@/api-handlers/authHandler';
 import { useUserStore } from '@/store/userStore';
+import { fetchUserPostsHandler } from '@/api-handlers/postHandler';
 
 const LoginPage = () => {
     const [username, setUsername] = useState('Demo');
@@ -16,6 +17,7 @@ const LoginPage = () => {
             const loginResponse = await userLoginHandler(username, password)
             if (loginResponse.success && loginResponse.userData) {
                 setUserData(loginResponse.userData)
+                fetchUserPostsHandler(loginResponse.userData._id)
                 router.replace("/")
             }
         }

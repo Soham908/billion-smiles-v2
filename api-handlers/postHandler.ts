@@ -1,3 +1,4 @@
+import { usePostStore } from "@/store/postStore";
 import { IApiResponse } from "@/types/typeApiResponse";
 import { IPost } from "@/types/typePost"
 import axios from "axios"
@@ -5,14 +6,38 @@ import axios from "axios"
 const url = process.env.EXPO_PUBLIC_API_URL + "/post";
 
 interface IFetchAllPosts extends IApiResponse {
-    allPosts: IPost[]
+    allPosts?: IPost[]
 }
 
 export const fetchAllPostHandler = async (): Promise<IFetchAllPosts> => {
-    const response = await axios.get(url + "/fetch-all-posts")
-    const { success, message, allPosts } = response.data
-    return { success: success, message: message, allPosts: allPosts }
+    try {
+        const response = await axios.get(url + "/fetch-all-posts")
+        const { success, message, allPosts } = response.data
+        return { success: success, message: message, allPosts: allPosts }
+    } catch (error) {
+        console.log("error occured: " + error)
+        return { success: false, message: "error: " + error }
+    }
 }
+
+
+interface IFetchUserPosts extends IApiResponse {
+  userPosts?: IPost[];
+}
+export const fetchUserPostsHandler = async (userId: string): Promise<IFetchUserPosts> => {
+  try {
+    const response = await axios.get(url + "/fetch-user-posts/" + userId);
+    const { success, message, userPosts } = response.data
+    const { setUserPosts } = usePostStore.getState()
+    setUserPosts(userPosts)
+    console.log(userPosts)
+    return { success: success, message: message, userPosts: userPosts };
+  } catch (error) {
+    console.log("error occurred");
+    return { success: false, message: "error: " + error };
+  }
+};
+
 
 interface IUserLikePost extends IApiResponse {
     postData?: any;
