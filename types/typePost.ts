@@ -2,6 +2,7 @@
 import { IUser } from "./typeUser";
 
 export interface IComment {
+  _id: string,
   userId: string;
   commentUsername?: string;
   commentText: string;

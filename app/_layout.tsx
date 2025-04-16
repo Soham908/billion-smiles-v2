@@ -6,6 +6,7 @@ import { Stack } from "expo-router";
 import { useEffect } from "react";
 import { SafeAreaView, StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import "@/utils/dayjs"
 
 export default function RootLayout() {
     const { userData, setUserData } = useUserStore()

@@ -8,28 +8,31 @@ import { fetchAllPostHandler } from '@/api-handlers/postHandler';
 import { IPost } from '@/types/typePost';
 import { useSheetStore } from '@/store/sheetStore';
 import CommentSheet from '@/components/bottom-sheet';
+import { usePostStore } from '@/store/postStore';
 
 const HomePage = () => {
     const router = useRouter();
     const userData = useUserStore((state) => state.userData);
-    const [allPosts, setAllPosts] = useState<IPost[]>();
     const [refreshing, setRefreshing] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0, height: 0 });
     const menuButtonRef = useRef(null);
     const { isCommentsOpen } = useSheetStore()
+    const { allPosts, setAllPosts } = usePostStore()
 
     useEffect(() => {
         const fetchAllPosts = async () => {
             const posts = await fetchAllPostHandler();
-            setAllPosts(posts.allPosts);
+            if (posts.success && posts.allPosts)
+                setAllPosts(posts.allPosts);
         };
         fetchAllPosts();
     }, []);
 
     const handleRefresh = async () => {
         const posts = await fetchAllPostHandler();
-        setAllPosts(posts.allPosts);
+        if (posts.success && posts.allPosts)
+            setAllPosts(posts.allPosts);
     };
 
     const handleOutsideClick = () => {

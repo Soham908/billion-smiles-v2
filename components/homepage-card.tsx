@@ -13,7 +13,7 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
     const [likesCounter, setLikesCounter] = useState(0)
     const scale = useRef(new Animated.Value(1)).current;
     const heartPosition = useRef(new Animated.Value(0)).current;
-    const { openCommentSheet } = useSheetStore()
+    const { setComments, openCommentSheet } = useSheetStore()
 
     const triggerHeartAnimation = () => {
         setHeartVisible(true);  // Show heart when double-tapped
@@ -64,6 +64,11 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
         setIsPostLiked(hasLiked);
         setLikesCounter(postData.likes)
     }, [postData])
+
+    const handleCommentSheet = () => {
+        openCommentSheet(postData._id)
+        setComments([...postData.comments].reverse())
+    }
 
     return (
         <View style={{ marginBottom: 32 }} >{/* Row 1: User Details */}
@@ -128,7 +133,7 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
                         </TouchableOpacity>
                         <Text style={{ alignContent: 'center', marginLeft: 4 }}>{likesCounter}</Text>
                     </View>
-                    <TouchableOpacity onPress={openCommentSheet} >
+                    <TouchableOpacity onPress={ handleCommentSheet } >
                         <MaterialIcons name='chat-bubble-outline' size={24} />
                     </TouchableOpacity>
                     <TouchableOpacity>
@@ -144,7 +149,7 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
                 {/* <Text style={styles.description}>
                     This is a description of the post.
                 </Text> */}
-                <Text style={styles.comments} onPress={openCommentSheet} >View all comments</Text>
+                <Text style={styles.comments} onPress={ handleCommentSheet } >View all comments</Text>
             </View>
 
 

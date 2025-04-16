@@ -3,123 +3,47 @@ import { StyleSheet, View, Text, Image, TouchableOpacity, KeyboardAvoidingView, 
 import BottomSheet, { BottomSheetScrollView, BottomSheetView, BottomSheetFooter, BottomSheetFooterProps, BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useSheetStore } from '@/store/sheetStore';
 import { MaterialIcons } from '@expo/vector-icons';
-
-const comments = [
-    {
-        id: 1,
-        username: 'johndoe',
-        avatar: 'https://i.pravatar.cc/150?img=1',
-        text: 'This is so cool!',
-        createdAt: '2h',
-    },
-    {
-        id: 2,
-        username: 'janesmith',
-        avatar: 'https://i.pravatar.cc/150?img=2',
-        text: 'Loving this! 🔥',
-        createdAt: '5h',
-    },
-    {
-        id: 3,
-        username: 'mike89',
-        avatar: 'https://i.pravatar.cc/150?img=3',
-        text: 'Awesome work, keep it up!',
-        createdAt: '1d',
-    },
-    {
-        id: 4,
-        username: 'sara_lee',
-        avatar: 'https://i.pravatar.cc/150?img=4',
-        text: 'Totally agree with this!',
-        createdAt: '3h',
-    },
-    {
-        id: 5,
-        username: 'techgeek',
-        avatar: 'https://i.pravatar.cc/150?img=5',
-        text: 'Just bookmarked this 🔖',
-        createdAt: '4h',
-    },
-    {
-        id: 6,
-        username: 'noahwrites',
-        avatar: 'https://i.pravatar.cc/150?img=6',
-        text: 'Can’t wait to try this out!',
-        createdAt: '45m',
-    },
-    {
-        id: 7,
-        username: 'emilyrose',
-        avatar: 'https://i.pravatar.cc/150?img=7',
-        text: 'This made my day 😊',
-        createdAt: '30m',
-    },
-    {
-        id: 8,
-        username: 'daniel_k',
-        avatar: 'https://i.pravatar.cc/150?img=8',
-        text: 'I wish I found this sooner!',
-        createdAt: '6h',
-    },
-    {
-        id: 9,
-        username: 'luna_star',
-        avatar: 'https://i.pravatar.cc/150?img=9',
-        text: 'So helpful, thank you!',
-        createdAt: '12h',
-    },
-    {
-        id: 10,
-        username: 'the_real_omar',
-        avatar: 'https://i.pravatar.cc/150?img=10',
-        text: 'Brilliant explanation 👏',
-        createdAt: '10m',
-    },
-    {
-        id: 81,
-        username: 'daniel_k',
-        avatar: 'https://i.pravatar.cc/150?img=8',
-        text: 'I wish I found this sooner!',
-        createdAt: '6h',
-    },
-    {
-        id: 91,
-        username: 'luna_star',
-        avatar: 'https://i.pravatar.cc/150?img=9',
-        text: 'So helpful, thank you!',
-        createdAt: '12h',
-    },
-    {
-        id: 102,
-        username: 'the_real_omar',
-        avatar: 'https://i.pravatar.cc/150?img=10',
-        text: 'Brilliant explanation 👏',
-        createdAt: '10m',
-    },
-    {
-        id: 191,
-        username: 'luna_star',
-        avatar: 'https://i.pravatar.cc/150?img=9',
-        text: 'So helpful, thank you!',
-        createdAt: '12h',
-    },
-    {
-        id: 1102,
-        username: 'the_real_omar',
-        avatar: 'https://i.pravatar.cc/150?img=10',
-        text: 'Brilliant explanation 👏',
-        createdAt: '10m',
-    },
-];
+import { uploadCommentHandler } from '@/api-handlers/postHandler';
+import { useUserStore } from '@/store/userStore';
+import dayjs from 'dayjs';
+import { TapGestureHandler } from 'react-native-gesture-handler';
+import { usePostStore } from '@/store/postStore';
+import { IPost } from '@/types/typePost';
 
 
-const CommentInputFooter = ({ onSubmit }: { onSubmit: (text: string) => void }) => {
-    const [text, setText] = useState('');
+const formatTimeShort = (date: string | Date) => {
+    const now = dayjs();
+    const time = dayjs(date);
+    const diffInMinutes = now.diff(time, 'minute');
 
-    const handleSend = () => {
-        if (!text.trim()) return;
-        onSubmit(text);
-        setText('');
+    if (diffInMinutes < 1) return 'just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m`;
+
+    const diffInHours = now.diff(time, 'hour');
+    if (diffInHours < 24) return `${diffInHours}h`;
+
+    const diffInDays = now.diff(time, 'day');
+    return `${diffInDays}d`;
+};
+
+
+const CommentInputFooter = () => {
+    const [commentText, setCommentText] = useState('');
+    const { userData } = useUserStore.getState()
+    const { postId, setComments } = useSheetStore()
+    const { allPosts, setAllPosts } = usePostStore()
+    const handleSend = async () => {
+        if (!commentText.trim()) return;
+        setCommentText('');
+        const response = await uploadCommentHandler(userData._id, userData.username, postId, commentText)
+        response.postData && setComments([...response.postData?.comments].reverse())
+        const postIndex = allPosts.findIndex((post: IPost) => post._id === postId)
+
+        const updatedPosts = [...allPosts]
+        if (response.postData) {
+            updatedPosts[postIndex] = response.postData;
+            setAllPosts(updatedPosts);
+        }
     };
 
     return (
@@ -129,14 +53,14 @@ const CommentInputFooter = ({ onSubmit }: { onSubmit: (text: string) => void }) 
         >
             <View style={styles.footerContainer}>
                 <Image
-                    source={{ uri: 'https://i.pravatar.cc/150?img=8' }}
+                    source={{ uri: 'https://i.pravatar.cc/150?img=4' }}
                     style={styles.inputAvatar}
                 />
                 <TextInput
                     placeholder="Add a comment..."
                     placeholderTextColor="#999"
-                    value={text}
-                    onChangeText={setText}
+                    value={commentText}
+                    onChangeText={setCommentText}
                     style={styles.input}
                 />
                 <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
@@ -149,15 +73,14 @@ const CommentInputFooter = ({ onSubmit }: { onSubmit: (text: string) => void }) 
 
 
 const CommentSheet = () => {
-    const { closeCommentSheet } = useSheetStore();
+    const { comments, closeCommentSheet } = useSheetStore();
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ['50%', '75%'], []);
-
 
     const renderFooter = useCallback(
         ({ animatedFooterPosition }: BottomSheetFooterProps) => (
             <BottomSheetFooter animatedFooterPosition={animatedFooterPosition}>
-                <CommentInputFooter onSubmit={(text) => console.log('Post:', text)} />
+                <CommentInputFooter />
             </BottomSheetFooter>
         ),
         []
@@ -176,6 +99,19 @@ const CommentSheet = () => {
         []
     );
 
+    const [likedComments, setLikedComments] = useState<{ [key: string]: boolean }>({});
+
+    const toggleLike = (commentId: string) => {
+        setLikedComments(prev => ({
+            ...prev,
+            [commentId]: !prev[commentId],
+        }));
+    };
+
+    const handleDoubleTap = (commentId: string) => {
+        toggleLike(commentId);
+    };
+
 
     return (
         <BottomSheet
@@ -192,23 +128,40 @@ const CommentSheet = () => {
                 contentContainerStyle={{ paddingBottom: 12 }}
             >
                 <BottomSheetView style={styles.innerContent}>
-                    {comments.map((comment) => (
-                        <View key={comment.id} style={styles.commentRow}>
-                            <Image source={{ uri: comment.avatar }} style={styles.avatar} />
+                    {comments.map((comment) => {
+                        const isLiked = likedComments[comment._id];
 
-                            <View style={styles.commentContent}>
-                                <Text style={styles.commentText}>
-                                    <Text style={styles.username}>{comment.username} </Text>
-                                    {comment.text}
-                                </Text>
-                                <Text style={styles.timestamp}>{comment.createdAt}</Text>
-                            </View>
+                        return (
+                            <TapGestureHandler
+                                key={comment._id}
+                                numberOfTaps={2}
+                                onActivated={() => handleDoubleTap(comment._id)}
+                            >
+                                <View style={styles.commentRow}>
+                                    <Image source={{ uri: 'https://i.pravatar.cc/150?img=1' }} style={styles.avatar} />
 
-                            <TouchableOpacity style={styles.likeButton}>
-                                <MaterialIcons name="favorite-outline" size={16} color="#888" />
-                            </TouchableOpacity>
-                        </View>
-                    ))}
+                                    <View style={styles.commentContent}>
+                                        <Text style={styles.commentText}>
+                                            <Text style={styles.username}>{comment.commentUsername} </Text>
+                                            {comment.commentText}
+                                        </Text>
+                                        <Text style={styles.timestamp}>
+                                            {formatTimeShort(comment.createdAt)}
+                                        </Text>
+                                    </View>
+
+                                    <TouchableOpacity style={styles.likeButton} onPress={() => toggleLike(comment._id)}>
+                                        <MaterialIcons
+                                            name={isLiked ? 'favorite' : 'favorite-outline'}
+                                            color={isLiked ? 'red' : 'black'}
+                                            size={20}
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                            </TapGestureHandler>
+                        );
+                    })}
+
                 </BottomSheetView>
             </BottomSheetScrollView>
         </BottomSheet>

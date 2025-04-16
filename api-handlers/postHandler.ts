@@ -39,10 +39,10 @@ export const fetchUserPostsHandler = async (userId: string): Promise<IFetchUserP
 };
 
 
-interface IUserLikePost extends IApiResponse {
-    postData?: any;
+interface IPostResponse extends IApiResponse {
+    postData?: IPost;
 }
-export const likePostHandler = async (userId: string, username: string, postId: string ): Promise<IUserLikePost> => {
+export const likePostHandler = async (userId: string, username: string, postId: string ): Promise<IPostResponse> => {
     try {
         const response = await axios.post(url + "/user-like-post", { userId, username, postId });
         const { success, message, postData } = response.data
@@ -51,4 +51,17 @@ export const likePostHandler = async (userId: string, username: string, postId: 
         console.log("error occurred");
         return { success: false, message: "error: " + error };
     }
+};
+
+
+export const uploadCommentHandler = async (userId: string, username: string, postId: string, commentText: string): Promise<IPostResponse> => {
+  try {
+    const response = await axios.post(url + "/upload-post-comment", { userId, username, postId, commentText });
+    const { success, message, postData } = response.data
+
+    return { success: success, message: message, postData: postData };
+  } catch (error) {
+    console.log("error occurred");
+    return { success: false, message: "error: " + error };
+  }
 };
