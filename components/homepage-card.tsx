@@ -5,6 +5,7 @@ import { IPost } from '@/types/typePost'
 import { GestureHandlerGestureEvent, State, TapGestureHandler } from 'react-native-gesture-handler'
 import { IUser } from '@/types/typeUser'
 import { likePostHandler } from '@/api-handlers/postHandler'
+import { useSheetStore } from '@/store/sheetStore'
 
 const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser }) => {
     const [heartVisible, setHeartVisible] = useState(false);
@@ -12,6 +13,7 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
     const [likesCounter, setLikesCounter] = useState(0)
     const scale = useRef(new Animated.Value(1)).current;
     const heartPosition = useRef(new Animated.Value(0)).current;
+    const { openCommentSheet } = useSheetStore()
 
     const triggerHeartAnimation = () => {
         setHeartVisible(true);  // Show heart when double-tapped
@@ -126,7 +128,7 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
                         </TouchableOpacity>
                         <Text style={{ alignContent: 'center', marginLeft: 4 }}>{likesCounter}</Text>
                     </View>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={openCommentSheet} >
                         <MaterialIcons name='chat-bubble-outline' size={24} />
                     </TouchableOpacity>
                     <TouchableOpacity>
@@ -142,7 +144,7 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
                 {/* <Text style={styles.description}>
                     This is a description of the post.
                 </Text> */}
-                <Text style={styles.comments}>View all comments</Text>
+                <Text style={styles.comments} onPress={openCommentSheet} >View all comments</Text>
             </View>
 
 

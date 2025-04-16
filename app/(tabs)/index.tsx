@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, RefreshControl, Modal, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, RefreshControl, Modal, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import HomePageCard from '@/components/homepage-card';
 import { useRouter } from 'expo-router';
 import { useUserStore } from '@/store/userStore';
 import { fetchAllPostHandler } from '@/api-handlers/postHandler';
 import { IPost } from '@/types/typePost';
+import { useSheetStore } from '@/store/sheetStore';
+import CommentSheet from '@/components/bottom-sheet';
 
 const HomePage = () => {
     const router = useRouter();
@@ -15,6 +17,7 @@ const HomePage = () => {
     const [menuVisible, setMenuVisible] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0, height: 0 });
     const menuButtonRef = useRef(null);
+    const { isCommentsOpen } = useSheetStore()
 
     useEffect(() => {
         const fetchAllPosts = async () => {
@@ -43,7 +46,7 @@ const HomePage = () => {
     return (
         <View style={styles.container}>
             <View style={styles.appbar}>
-                <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>App Name</Text>
+                <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>Billion Smiles</Text>
                 <TouchableOpacity style={{ margin: 10 }} onPress={() => router.push("/create-post")}>
                     <MaterialIcons name="add" size={24} />
                 </TouchableOpacity>
@@ -74,14 +77,14 @@ const HomePage = () => {
                     animationType="fade"
                     onRequestClose={handleOutsideClick}
                 >
-                    <TouchableWithoutFeedback onPress={handleOutsideClick}>
+                    <Pressable onPress={handleOutsideClick} style={{ flex: 1 }}>
                         <View style={styles.overlay}>
                             <View
                                 style={[
                                     styles.menuContainer,
                                     {
-                                        top: menuPosition.y + menuPosition.height + 12, // Position below the button
-                                        left: menuPosition.x - 48, // Align with the left of the button
+                                        top: menuPosition.y + menuPosition.height + 12,
+                                        left: menuPosition.x - 48,
                                     },
                                 ]}
                             >
@@ -106,9 +109,11 @@ const HomePage = () => {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    </TouchableWithoutFeedback>
+                    </Pressable>
                 </Modal>
             )}
+
+            { isCommentsOpen && <CommentSheet /> }
 
         </View>
     );
@@ -126,7 +131,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Dimmed background
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
     },
     appbar: {
         flexDirection: 'row',
