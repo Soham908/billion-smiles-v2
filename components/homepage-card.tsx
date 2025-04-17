@@ -77,7 +77,7 @@ const HomePageCard = ({ postData, userData }: { postData: IPost, userData: IUser
                     source={require("@/assets/images/user.png")}
                     style={styles.profileImage}
                 />
-                <Text style={styles.username}>{postData.userId.username}</Text>
+                <Text style={styles.username}>{postData.userId?.username}</Text>
                 <Image
                     source={{ uri: 'https://placehold.co/40' }}
                     style={styles.badgeImage}

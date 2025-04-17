@@ -33,10 +33,10 @@ interface IPostDetails {
     imageUrl: string,
     caption: string,
 }
-interface ICreatPostResponse extends IApiResponse {
+interface ICreatePostResponse extends IApiResponse {
     postData?: IPost
 }
-export const createPostHandler = async (postDetails: IPostDetails, uri: string): Promise<ICreatPostResponse> => {
+export const createPostHandler = async (postDetails: IPostDetails, uri: string): Promise<ICreatePostResponse> => {
     try {
         console.log(postDetails)
         const imageUrl = await uploadImageToCloudinary(uri);

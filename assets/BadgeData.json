@@ -1,0 +1,92 @@
+[
+    {
+        "title": "Welcome Changemaker",
+        "url": "https://cdn-icons-png.flaticon.com/512/11191/11191748.png",
+        "causeCategory": "General",
+        "milestoneDescription": "Awarded for signing up to make a difference in the world.",
+        "campaignName": null,
+        "companyName": null,
+        "rarity": "Common"
+    },
+    {
+        "title": "First Post Pioneer",
+        "url": "https://cdn-icons-png.flaticon.com/512/11637/11637439.png",
+        "causeCategory": "General",
+        "milestoneDescription": "Celebrating your first step in spreading awareness with your post.",
+        "campaignName": null,
+        "companyName": null,
+        "rarity": "Common"
+    },
+    {
+        "title": "Animal Advocate",
+        "url": "https://cdn-icons-png.flaticon.com/512/11117/11117140.png",
+        "causeCategory": "Animal Welfare",
+        "milestoneDescription": "For supporting an animal welfare cause for the first time.",
+        "campaignName": "Save Animals",
+        "companyName": "Tata Group",
+        "rarity": "Common"
+    },
+    {
+        "title": "Nature's Guardian",
+        "url": "https://cdn-icons-png.flaticon.com/512/10829/10829952.png",
+        "causeCategory": "Environment",
+        "milestoneDescription": "Awarded for contributing to an environmental campaign for the first time.",
+        "campaignName": "Save the rainforest",
+        "companyName": "Godrej",
+        "rarity": "Common"
+    },
+    {
+        "title": "Health Hero",
+        "url": "https://cdn-icons-png.flaticon.com/512/8858/8858760.png",
+        "causeCategory": "Healthcare",
+        "milestoneDescription": "For showing support to a healthcare initiative.",
+        "campaignName": "Support mental health",
+        "companyName": "Mindspace",
+        "rarity": "Common"
+    },
+    {
+        "title": "Education Advocate",
+        "url": "https://cdn-icons-png.flaticon.com/512/11448/11448797.png",
+        "causeCategory": "Education",
+        "milestoneDescription": "Awarded for participating in a campaign to promote education.",
+        "campaignName": "Educate kids",
+        "companyName": "Infosys",
+        "rarity": "Common"
+    },
+    {
+        "title": "Animal Ally",
+        "url": "https://cdn-icons-png.flaticon.com/512/21/21645.png",
+        "causeCategory": "Animal Welfare",
+        "milestoneDescription": "For supporting a campaign for animal welfare repeatedly.",
+        "campaignName": "Welfare for quite ones",
+        "companyName": "Mahindra",
+        "rarity": "Uncommon"
+    },
+    {
+        "title": "Eco Warrior",
+        "url": "https://cdn-icons-png.flaticon.com/512/5928/5928120.png",
+        "causeCategory": "Environment",
+        "milestoneDescription": "For actively supporting multiple environmental campaigns.",
+        "campaignName": "Global warming reversing",
+        "companyName": "Reliance",
+        "rarity": "Uncommon"
+    },
+    {
+        "title": "Culture Admirer",
+        "url": "https://cdn-icons-png.flaticon.com/512/14696/14696638.png",
+        "causeCategory": "Cultre",
+        "milestoneDescription": "For supporting campaigns aimed at preserving art and culture.",
+        "campaignName": "Saving culture from modernization",
+        "companyName": "Wipro",
+        "rarity": "Rare"
+    },
+    {
+        "title": "Cat Momma",
+        "url": "https://cdn-icons-png.flaticon.com/512/15133/15133108.png",
+        "causeCategory": "Animal Welfare - Cats",
+        "milestoneDescription": "Recognizing your love for our feline friends through campaigns.",
+        "campaignName": null,
+        "companyName": null,
+        "rarity": "Rare"
+    }
+]

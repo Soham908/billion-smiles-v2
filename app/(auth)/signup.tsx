@@ -1,34 +1,45 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
-import { Link, useRouter } from 'expo-router'; // Import the Link component from expo-router
-import { userSignupHandler } from '@/api-handlers/authHandler';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, Switch } from 'react-native';
+import { Link, useRouter } from 'expo-router';
+import { userSignupHandler, ngoSignupHandler } from '@/api-handlers/authHandler';
+import { useUserStore } from '@/store/userStore';
 
 const SignupPage = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const router = useRouter()
+    const [isNGO, setIsNGO] = useState(false);
+    const [organizationName, setOrganizationName] = useState('');
+    const [registrationId, setRegistrationId] = useState('');
 
+    const { setUserData } = useUserStore();
+    const router = useRouter();
 
     const handleSignup = async () => {
-        if (username !== "" && password !== "" && email !== "") {
-            const signupResponse = await userSignupHandler(username, password, email)
-            if (signupResponse.success) {
-                router.replace("/")
+        if (!username || !email || !password) return;
+
+        if (isNGO) {
+            if (!organizationName || !registrationId) return;
+            const res = await ngoSignupHandler(username, password, email, organizationName, registrationId);
+            if (res.success && res.userData) {
+                setUserData(res.userData);
+                router.replace('/');
+            }
+        } else {
+            const res = await userSignupHandler(username, password, email);
+            if (res.success && res.userData) {
+                setUserData(res.userData);
+                router.replace('/');
             }
         }
     };
 
     return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-            <Pressable onPress={() => Keyboard.dismiss()} style={{ flex: 1 }}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
                 <View style={styles.container}>
                     <Text style={styles.heading}>Create an Account</Text>
 
-                    {/* Name Input */}
                     <TextInput
                         style={styles.input}
                         placeholder="Username"
@@ -36,7 +47,6 @@ const SignupPage = () => {
                         onChangeText={setUsername}
                     />
 
-                    {/* Email Input */}
                     <TextInput
                         style={styles.input}
                         placeholder="Email Address"
@@ -45,7 +55,6 @@ const SignupPage = () => {
                         keyboardType="email-address"
                     />
 
-                    {/* Password Input */}
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
@@ -54,17 +63,38 @@ const SignupPage = () => {
                         secureTextEntry
                     />
 
-                    {/* Register Button */}
+                    {/* NGO Toggle */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                        <Switch value={isNGO} onValueChange={setIsNGO} />
+                        <Text style={{ marginLeft: 10, fontSize: 16 }}>Registering as NGO</Text>
+                    </View>
+
+                    {/* Conditional NGO Fields */}
+                    {isNGO && (
+                        <>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Organization Name"
+                                value={organizationName}
+                                onChangeText={setOrganizationName}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Registration ID"
+                                value={registrationId}
+                                onChangeText={setRegistrationId}
+                            />
+                        </>
+                    )}
+
                     <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
                         <Text style={styles.signupButtonText}>Signup</Text>
                     </TouchableOpacity>
 
-                    {/* Already have an account link */}
                     <Link href="/login" style={styles.loginLink}>
                         <Text style={styles.loginLinkText}>Already have an account? Login</Text>
                     </Link>
 
-                    {/* Social Media Signup */}
                     <View style={styles.socialSignupContainer}>
                         <TouchableOpacity style={styles.socialButton}>
                             <Image
@@ -75,7 +105,6 @@ const SignupPage = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
-
             </Pressable>
         </KeyboardAvoidingView>
     );
@@ -88,7 +117,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 25,
         paddingVertical: 20,
-        // paddingBottom: 100,
         backgroundColor: '#FFF',
     },
     heading: {

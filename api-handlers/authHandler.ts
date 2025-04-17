@@ -31,6 +31,17 @@ export const userSignupHandler = async (username: string, password: string, emai
 };
 
 
+export const ngoSignupHandler = async (username: string, password: string, email: string, organizationName: string, registrationId: string): Promise<IUserAuth> => {
+    try {
+        const response = await axios.post(url + "/ngo-signup", { username, password, email, organizationName, registrationId });
+        return { success: response.data.success, message: response.data.message, userData: response.data.userData };
+    } catch (error) {
+        console.log("error occurred");
+        return { success: false, message: "error: " + error };
+    }
+};
+
+
 export const fetchUserDataHandler = async (userId: string): Promise<IUserAuth> => {
     try {
         const response = await axios.get(url + "/fetch-user-data/" + userId);

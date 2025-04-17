@@ -1,23 +1,40 @@
+import BadgeSection from '@/components/badge-section';
+import HeaderMenu from '@/components/header-menu';
 import { usePostStore } from '@/store/postStore';
 import { useUserStore } from '@/store/userStore';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router, useRouter } from 'expo-router';
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList, LayoutChangeEvent } from 'react-native';
 
 const ProfileHeader = () => {
-    
+
     const { userData } = useUserStore()
     const router = useRouter()
+
+    const [menuVisible, setMenuVisible] = useState(false);
+    const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0, height: 0 });
+    const menuButtonRef = useRef(null);
+
+    const handleMenuButtonLayout = (event: LayoutChangeEvent) => {
+        const { x, y, height } = event.nativeEvent.layout;
+        setMenuPosition({ x, y, height });
+    };
+
 
     return (
         <View style={styles.headerContainer}>
             <View style={styles.appbar}>
-                <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>{ userData.username || "Username" }</Text>
+                <Text style={{ flex: 1, fontSize: 24, fontWeight: 'bold' }}>{userData.username || "Username"}</Text>
                 <TouchableOpacity style={{ margin: 10 }} onPress={() => router.push("/create-post")}>
                     <MaterialIcons name='add' size={24} />
                 </TouchableOpacity>
-                <TouchableOpacity style={{ margin: 0 }}>
+                <TouchableOpacity
+                    ref={menuButtonRef}
+                    style={{ margin: 0 }}
+                    onPress={() => setMenuVisible(!menuVisible)}
+                    onLayout={handleMenuButtonLayout}
+                >
                     <MaterialIcons name='menu' size={24} />
                 </TouchableOpacity>
 
@@ -52,7 +69,7 @@ const ProfileHeader = () => {
 
             {/* User Description Section */}
             <View style={styles.userDescriptionSection}>
-                <Text style={styles.username}>{ userData.username || "Username" }</Text>
+                <Text style={styles.username}>{userData.username || "Username"}</Text>
                 <Text style={styles.description}>Passionate about making a difference. Helping animals, supporting education, and more.</Text>
                 <Text style={styles.sectionTitle}>Supports</Text>
                 <View style={styles.supportsContainer}>
@@ -63,13 +80,9 @@ const ProfileHeader = () => {
                     ))}
                 </View>
                 <Text style={styles.sectionTitle}>Badges & Stats</Text>
-                <View style={styles.badgesContainer}>
-                    {[{ id: 1 }, { id: 2 }].map((badge) => (
-                        <View key={badge.id} style={styles.badge}>
-                            <Image source={{ uri: 'https://placehold.co/100' }} style={styles.badgeImage} />
-                        </View>
-                    ))}
-                </View>
+
+                <BadgeSection />
+                
                 <View style={styles.statsContainer}>
                     {[
                         { id: 1, label: 'Hearts Earned', value: 1500 },
@@ -88,17 +101,23 @@ const ProfileHeader = () => {
             <View style={styles.userDescriptionSection}>
                 <Text style={styles.sectionTitle}>Posts Created</Text>
             </View>
+
+
+            {menuVisible && (
+                <HeaderMenu menuPosition={menuPosition} menuVisible={menuVisible} setMenuVisible={setMenuVisible} />
+            )}
+
         </View>
     );
 };
 
 const ProfileFooter = () => {
-    return(
+    return (
         <View style={styles.profileFooterSection}>
             <Text style={styles.footerTitle}>
                 Create more posts
             </Text>
-            <TouchableOpacity style={{ alignContent:'center', justifyContent: 'center', marginStart: 12 }} onPress={() => router.push("/create-post")}>
+            <TouchableOpacity style={{ alignContent: 'center', justifyContent: 'center', marginStart: 12 }} onPress={() => router.push("/create-post")}>
                 <MaterialIcons name='add' size={28} />
             </TouchableOpacity>
         </View>
@@ -108,7 +127,6 @@ const ProfileFooter = () => {
 const ProfilePage = () => {
 
     const { userPosts } = usePostStore()
-    userPosts.map((post) => console.log(post.caption))
     return (
         <FlatList
             data={userPosts}
