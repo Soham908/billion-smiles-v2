@@ -46,6 +46,7 @@ export default function RootLayout() {
 
                     <Stack.Screen name="(screens)/create-post" options={{ headerShown: false }} />
                     <Stack.Screen name="(screens)/settings" options={{ headerShown: false }} />
+                    <Stack.Screen name="(screens)/create-cause" options={{ headerShown: false }} />
                 </Stack>
             </SafeAreaView>
         </GestureHandlerRootView>

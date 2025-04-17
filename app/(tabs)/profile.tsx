@@ -1,4 +1,5 @@
 import BadgeSection from '@/components/badge-section';
+import CauseList from '@/components/cause-list';
 import HeaderMenu from '@/components/header-menu';
 import { usePostStore } from '@/store/postStore';
 import { useUserStore } from '@/store/userStore';
@@ -71,31 +72,46 @@ const ProfileHeader = () => {
             <View style={styles.userDescriptionSection}>
                 <Text style={styles.username}>{userData.username || "Username"}</Text>
                 <Text style={styles.description}>Passionate about making a difference. Helping animals, supporting education, and more.</Text>
-                <Text style={styles.sectionTitle}>Supports</Text>
-                <View style={styles.supportsContainer}>
-                    {['Animals', 'Education', 'Environment'].map((cause, index) => (
-                        <View key={index} style={styles.causeLabel}>
-                            <Text style={styles.causeLabelText}>{cause}</Text>
-                        </View>
-                    ))}
-                </View>
-                <Text style={styles.sectionTitle}>Badges & Stats</Text>
 
-                <BadgeSection />
-                
-                <View style={styles.statsContainer}>
-                    {[
-                        { id: 1, label: 'Hearts Earned', value: 1500 },
-                        { id: 2, label: 'Impact Created', value: 250 },
-                    ].map((stat) => (
-                        <View key={stat.id} style={styles.statsCard}>
-                            <View style={styles.statItem}>
-                                <Text style={styles.statValue}>{stat.value}</Text>
-                                <Text style={styles.statLabel}>{stat.label}</Text>
-                            </View>
+                {userData.userType === 'ngo' ?
+                    <View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.sectionTitle}>Causes Created</Text>
+                            <TouchableOpacity style={styles.createCauseButton} onPress={() => router.push("/create-cause")}>
+                                <MaterialIcons name='add' size={16} />
+                            </TouchableOpacity>
                         </View>
-                    ))}
-                </View>
+                        <CauseList />
+                    </View>
+                    :
+                    <View>
+                        <Text style={styles.sectionTitle}>Supports</Text>
+                        <View style={styles.supportsContainer}>
+                            {['Animals', 'Education', 'Environment'].map((cause, index) => (
+                                <View key={index} style={styles.causeLabel}>
+                                    <Text style={styles.causeLabelText}>{cause}</Text>
+                                </View>
+                            ))}
+                        </View>
+                        <Text style={styles.sectionTitle}>Badges & Stats</Text>
+
+                        <BadgeSection />
+
+                        <View style={styles.statsContainer}>
+                            {[
+                                { id: 1, label: 'Hearts Earned', value: 1500 },
+                                { id: 2, label: 'Impact Created', value: 250 },
+                            ].map((stat) => (
+                                <View key={stat.id} style={styles.statsCard}>
+                                    <View style={styles.statItem}>
+                                        <Text style={styles.statValue}>{stat.value}</Text>
+                                        <Text style={styles.statLabel}>{stat.label}</Text>
+                                    </View>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+                }
             </View>
 
             <View style={styles.userDescriptionSection}>
@@ -137,7 +153,6 @@ const ProfilePage = () => {
                     <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
                 </TouchableOpacity>
             )}
-            contentContainerStyle={styles.postsContainer}
             ListHeaderComponent={<ProfileHeader />}
             ListFooterComponent={<ProfileFooter />}
         />
@@ -160,16 +175,10 @@ const styles = StyleSheet.create({
     headerContainer: {
         backgroundColor: '#FFF',
     },
-    // ... your header and other section styles (userDetailSection, leftColumn, rightColumn, etc.)
-    // Example for profileImage, statsRow, etc.
     profileImage: {
         width: 90,
         height: 90,
         borderRadius: 45,
-    },
-    // Styles for posts grid remain the same
-    postsContainer: {
-        // No horizontal padding for full-width grid
     },
     postItem: {
         flex: 1,
@@ -182,7 +191,6 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
-    // ... add your other styles here
     userDetailSection: {
         flexDirection: 'row',
         paddingHorizontal: 16,
@@ -318,6 +326,22 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginVertical: 8,
         color: '#333',
+    },
+    createCauseButton: {
+        paddingVertical: 4,
+        paddingHorizontal: 4,
+        // paddingRight: 12,
+        borderRadius: 40,
+        flexDirection: 'row',
+        borderWidth: 1,
+        backgroundColor: 'transparent',
+        alignSelf: 'center',
+        justifyContent: 'center',
+        marginLeft: 12,
+    },
+    createCauseText: {
+        fontSize: 12,
+        fontWeight: 'bold',
     },
 });
 

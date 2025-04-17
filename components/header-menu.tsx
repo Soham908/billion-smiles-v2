@@ -47,7 +47,7 @@ const HeaderMenu = ({ menuVisible, setMenuVisible, menuPosition }: Props) => {
                             style={styles.menuItem}
                             onPress={() => {
                                 useUserStore.getState().logoutUser();
-                                router.push('/login');
+                                router.replace('/login');
                                 setMenuVisible(false);
                             }}
                         >

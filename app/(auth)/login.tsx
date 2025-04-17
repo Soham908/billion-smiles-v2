@@ -6,7 +6,7 @@ import { useUserStore } from '@/store/userStore';
 import { fetchUserPostsHandler } from '@/api-handlers/postHandler';
 
 const LoginPage = () => {
-    const [username, setUsername] = useState('Demo');
+    const [username, setUsername] = useState('Ngo');
     const [password, setPassword] = useState('Pass');
     const { setUserData } = useUserStore()
     const router = useRouter()

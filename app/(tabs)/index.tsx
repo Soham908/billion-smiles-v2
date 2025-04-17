@@ -7,7 +7,7 @@ import { useUserStore } from '@/store/userStore';
 import { fetchAllPostHandler } from '@/api-handlers/postHandler';
 import { IPost } from '@/types/typePost';
 import { useSheetStore } from '@/store/sheetStore';
-import CommentSheet from '@/components/bottom-sheet';
+import CommentSheet from '@/components/comment-sheet';
 import { usePostStore } from '@/store/postStore';
 import HeaderMenu from '@/components/header-menu';
 
