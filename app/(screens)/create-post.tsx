@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, TextInput, KeyboardAvoidingView, Keyboard, Platform, ScrollView, Pressable } from 'react-native';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, TextInput, KeyboardAvoidingView, Keyboard, Platform, ScrollView, Pressable, FlatList } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker"
 import { useUserStore } from '@/store/userStore';
-import { createPostHandler } from '@/api-handlers/uploadPostHandler';
+import { createPostHandler, IPostDetails } from '@/api-handlers/uploadPostHandler';
 import { useRouter } from 'expo-router';
+import { fetchCausesHandler } from '@/api-handlers/causeHandler';
+import { ICause } from '@/types/typeCause';
+import { CauseCard } from '@/components/create-post-cause-list';
+
 
 const CreatePost = () => {
     const [caption, setCaption] = useState("");
@@ -13,6 +17,14 @@ const CreatePost = () => {
     const [disableButton, setDisableButton] = useState(false)
     const { userData } = useUserStore()
     const router = useRouter()
+
+    const [selectedCauseId, setSelectedCauseId] = useState<string | null>(null);
+    const [causeData, setCauseData] = useState<ICause>()
+    const handleSelectCause = (cause: ICause) => {
+        setSelectedCauseId(prev => prev === cause._id ? null : cause._id!);
+        setCauseData(cause)
+    };
+
 
     const recommendedCampaigns = [
         { id: '1', campaignTitle: 'Clean Earth Initiative', companyName: 'GreenWorld', location: 'New York', causeName: 'Environment' },
@@ -46,90 +58,88 @@ const CreatePost = () => {
 
     const uploadPost = async () => {
         setDisableButton(true);
-        const postDetails = { userId: userData._id, imageUrl: "", caption: caption }
-        const response = await createPostHandler(postDetails, uploadUri);
-        // if (response.success && response.postData) {
-        //   fetchAllPostsStoreFunc()
-        //   fetchUserPostsStoreFunc(userData._id)
-        // }
+        if (caption !== '' && uploadUri) {
+            const postDetails: IPostDetails = { userId: userData._id, imageUrl: "", caption: caption, causeId: causeData?._id! }
+            const response = await createPostHandler(postDetails, uploadUri);
+            router.replace("/");
+        }
         setDisableButton(false);
-        router.replace("/");
     };
 
+    const [allCauses, setAllCauses] = useState<ICause[]>()
+
+
+    useEffect(() => {
+        const fetchCauses = async () => {
+            const response = await fetchCausesHandler()
+            console.log(response)
+            if (response.success && response.causeData)
+                setAllCauses(response.causeData)
+        }
+        fetchCauses()
+    }, [])
+
     return (
-        <ScrollView style={styles.container}>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            >
-                <Pressable onPress={() => Keyboard.dismiss()}>
-                    <View style={styles.container}>
-                        {/* Image Picker Section */}
-                        <TouchableOpacity style={styles.imagePickerContainer} onPress={pickImage}>
-                            {selectedImageURI ? (
-                                <Image source={{ uri: selectedImageURI }} style={styles.selectedImage} />
-                            ) : (
-                                <View style={styles.placeholder}>
-                                    <Ionicons name="image-outline" size={50} color="#ccc" />
-                                    <Text style={styles.placeholderText}>Select an Image</Text>
-                                </View>
-                            )}
-                        </TouchableOpacity>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <ScrollView style={styles.container}>
+                <View style={styles.container}>
+                    {/* Image Picker Section */}
+                    <TouchableOpacity style={styles.imagePickerContainer} onPress={pickImage}>
+                        {selectedImageURI ? (
+                            <Image source={{ uri: selectedImageURI }} style={styles.selectedImage} />
+                        ) : (
+                            <View style={styles.placeholder}>
+                                <MaterialIcons name="image" size={50} color="#ccc" />
+                                <Text style={styles.placeholderText}>Select an Image</Text>
+                            </View>
+                        )}
+                    </TouchableOpacity>
 
-                        {/* Caption Input */}
-                        <Text style={styles.sectionTitle}>Captions</Text>
-                        <View style={styles.captionContainer}>
-                            <TextInput
-                                style={styles.captionInput}
-                                placeholder="Write a caption..."
-                                placeholderTextColor="#888"
-                                multiline
-                                value={caption}
-                                onChangeText={setCaption}
-                            />
-                        </View>
-
-                        {/* Recommended Campaigns */}
-                        <View style={styles.sectionContainer}>
-                            <Text style={styles.sectionTitle}>Recommended Campaigns</Text>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                <View style={styles.columnsContainer}>
-                                    {columns.map((column, colIndex) => (
-                                        <View key={colIndex} style={styles.column}>
-                                            {column.map((item) => (
-                                                <TouchableOpacity key={item.id} style={styles.campaignCard}>
-                                                    <Text style={styles.campaignTitle}>{item.campaignTitle}</Text>
-                                                    <View style={styles.campaignDetailSection}>
-                                                        <MaterialIcons name="apartment" size={24} />
-                                                        <Text style={styles.campaignText}>{item.companyName}</Text>
-                                                    </View>
-                                                    <View style={styles.campaignDetailSection}>
-                                                        <MaterialIcons name="location-on" size={24} />
-                                                        <Text style={styles.campaignText}>{item.location}</Text>
-
-
-                                                        <MaterialIcons name="volunteer-activism" size={24} />
-                                                        <Text style={styles.campaignText}>{item.causeName}</Text>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            ))}
-                                        </View>
-                                    ))}
-                                </View>
-                            </ScrollView>
-                        </View>
-
-                        {/* Upload Post Button */}
-                        <TouchableOpacity style={[
-                            styles.uploadButton,
-                            disableButton ? styles.disabledButton : null
-                        ]} onPress={() => uploadPost()} disabled={disableButton}>
-                            <Text style={styles.uploadButtonText}>Upload Post</Text>
-                        </TouchableOpacity>
+                    {/* Caption Input */}
+                    <Text style={styles.sectionTitle}>Captions</Text>
+                    <View style={styles.captionContainer}>
+                        <TextInput
+                            style={styles.captionInput}
+                            placeholder="Write a caption..."
+                            placeholderTextColor="#888"
+                            multiline
+                            value={caption}
+                            onChangeText={setCaption}
+                        />
                     </View>
-                </Pressable>
-            </KeyboardAvoidingView>
-        </ScrollView>
+
+                    {/* Recommended Campaigns */}
+                    <View style={styles.sectionContainer}>
+                        <Text style={styles.sectionTitle}>Recommended Campaigns</Text>
+                        <FlatList
+                            data={allCauses}
+                            renderItem={({ item }) => (
+                                <CauseCard
+                                    cause={item}
+                                    isSelected={item._id === selectedCauseId}
+                                    onPress={handleSelectCause}
+                                />
+                            )}
+                            keyExtractor={(item) => item._id!}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ paddingLeft: 16 }}
+                        />
+                    </View>
+
+                    {/* Upload Post Button */}
+                    <TouchableOpacity style={[
+                        styles.uploadButton,
+                        disableButton ? styles.disabledButton : null
+                    ]} onPress={() => uploadPost()} disabled={disableButton}>
+                        <Text style={styles.uploadButtonText}>Upload Post</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 

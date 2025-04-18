@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    TextInput,
-    StyleSheet,
-    ScrollView,
-    TouchableOpacity,
-    Switch,
-    FlatList,
-    Pressable,
-} from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Switch, Pressable, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { createCauseHandler } from '@/api-handlers/causeHandler';
+import * as ImagePicker from "expo-image-picker"
+import { ICause } from '@/types/typeCause';
+import { useUserStore } from '@/store/userStore';
+import { router } from 'expo-router';
 
 const categories = ['Education', 'Environment', 'Animals', 'Healthcare', 'Food Security'];
 const mockLocations = ['Pune', 'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad'];
@@ -21,34 +16,75 @@ const CreateCausePage = () => {
     const [description, setDescription] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-    const [locationQuery, setLocationQuery] = useState('');
+    const [location, setLocation] = useState('');
     const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
     const [volunteerDate, setVolunteerDate] = useState(new Date());
     const [needsVolunteers, setNeedsVolunteers] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [disableButton, setDisableButton] = useState(false)
 
     const [unitDescription, setUnitDescription] = useState('');
     const [unitCost, setUnitCost] = useState('');
     const [minUnits, setMinUnits] = useState('');
     const [maxUnits, setMaxUnits] = useState('');
+    const { userData } = useUserStore()
 
-
-    const handleDateChange = (event: any, selectedDate?: Date) => {
+    const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         setShowDatePicker(false);
         if (selectedDate) setVolunteerDate(selectedDate);
     };
 
     const handleLocationSearch = (text: string) => {
-        setLocationQuery(text);
+        setLocation(text);
         const filtered = mockLocations.filter((loc) =>
             loc.toLowerCase().includes(text.toLowerCase())
         );
         setLocationSuggestions(filtered);
     };
 
+    const [selectedImageURI, setSelectedImageURI] = useState("")
+    const [uploadUri, setUploadUri] = useState("")
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ["images"],
+            quality: 1,
+            base64: true,
+        });
+
+        if (!result.canceled) {
+            setSelectedImageURI(result.assets[0].uri);
+            let base64Img = `data:${result.assets[0].mimeType};base64,${result.assets[0].base64}`;
+            setUploadUri(base64Img);
+        }
+    };
+
+
+    const handleCauseSubmit = async () => {
+        setDisableButton(true);
+        const causeData: ICause = {
+            causeTitle, description, category: selectedCategory, location, volunteerDate, needsVolunteers, unitDescription, unitCost: parseInt(unitCost), minUnits: parseInt(minUnits), maxUnits: parseInt(maxUnits),
+            ngoName: userData.username, ngoRef: userData._id, status: 'Ongoing', imageUrl: uploadUri
+        }
+        const response = await createCauseHandler(causeData)
+        console.log(response)
+        router.replace('/profile')
+        setDisableButton(false);
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>Create New Cause</Text>
+
+            <TouchableOpacity style={styles.imagePickerContainer} onPress={pickImage}>
+                {selectedImageURI ? (
+                    <Image source={{ uri: selectedImageURI }} style={styles.selectedImage} />
+                ) : (
+                    <View style={styles.placeholder}>
+                        <MaterialIcons name="image" size={50} color="#ccc" />
+                        <Text style={styles.placeholderText}>Select an Image</Text>
+                    </View>
+                )}
+            </TouchableOpacity>
 
             <TextInput
                 style={styles.input}
@@ -102,7 +138,7 @@ const CreateCausePage = () => {
                 <TextInput
                     style={styles.input}
                     placeholder="Location"
-                    value={locationQuery}
+                    value={location}
                     onChangeText={handleLocationSearch}
                 />
                 {locationSuggestions.length > 0 && (
@@ -112,7 +148,7 @@ const CreateCausePage = () => {
                                 key={loc}
                                 style={styles.dropdownItem}
                                 onPress={() => {
-                                    setLocationQuery(loc);
+                                    setLocation(loc);
                                     setLocationSuggestions([]);
                                 }}
                             >
@@ -200,7 +236,7 @@ const CreateCausePage = () => {
             </View>
 
             {/* Real-time Calculator */}
-            {unitCost && (minUnits || maxUnits) && (
+            {unitCost && (minUnits || maxUnits) ? (
                 <View style={styles.calculator}>
                     {minUnits !== '' && (
                         <Text style={styles.calcText}>
@@ -213,11 +249,14 @@ const CreateCausePage = () => {
                         </Text>
                     )}
                 </View>
-            )}
+            ) : null}
 
 
             {/* Submit */}
-            <TouchableOpacity style={styles.submitButton}>
+            <TouchableOpacity style={[
+                styles.submitButton,
+                disableButton ? styles.disabledButton : null
+            ]} onPress={handleCauseSubmit} disabled={disableButton}>
                 <Text style={styles.submitText}>Submit Cause</Text>
             </TouchableOpacity>
         </ScrollView>
@@ -337,6 +376,32 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: '#333',
     },
-
-
+    imagePickerContainer: {
+        width: '64%',
+        height: 180,
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        backgroundColor: '#000',
+        borderRadius: 12,
+        marginBottom: 16,
+    },
+    placeholder: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    placeholderText: {
+        marginTop: 8,
+        fontSize: 16,
+        color: '#888',
+    },
+    selectedImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 10,
+    },
+    disabledButton: {
+        backgroundColor: '#ccc',
+        opacity: 0.6,
+    },
 });

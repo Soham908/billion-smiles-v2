@@ -1,4 +1,5 @@
 // import { ICampaign } from "./campaignType";
+import { ICause } from "./typeCause";
 import { IUser } from "./typeUser";
 
 export interface IComment {
@@ -14,7 +15,7 @@ export interface IPost {
   userId: IUser;
   imageUrl: string;
   caption: string;
-//   campaignId: ICampaign;
+  causeId: ICause;
   tags: string[];
   likes: number;
   likedBy: [{ userId: string, likedUsername: string }];

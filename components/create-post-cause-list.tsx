@@ -1,19 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { ICause } from '@/types/typeCause';
-import { fetchUserCausesHandler } from '@/api-handlers/causeHandler';
-import { useUserStore } from '@/store/userStore';
+import { ICause } from "@/types/typeCause";
+import { MaterialIcons } from "@expo/vector-icons";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 
-const CauseCard = ({ cause }: { cause: ICause }) => {
-    // Truncate the description after 2 lines or 20 words (for simplicity)
+interface CauseCardProps {
+    cause: ICause;
+    isSelected?: boolean;
+    onPress?: (cause: ICause) => void;
+}
+
+
+export const CauseCard = ({ cause, isSelected, onPress }: CauseCardProps) => {
     const truncatedDescription = cause.description.length > 75
         ? cause.description.substring(0, 75) + '...'
         : cause.description;
 
     return (
-        <View style={styles.card}>
+        <TouchableOpacity
+            onPress={() => onPress?.(cause)}
+            style={[
+                styles.card,
+                isSelected && { backgroundColor: '#AAFFAA' }
+            ]}
+        >
             <View style={styles.cardContent}>
                 <Text style={styles.causeTitle}>{cause.causeTitle}</Text>
                 <Text style={styles.shortDescription}>{truncatedDescription}</Text>
@@ -34,38 +43,10 @@ const CauseCard = ({ cause }: { cause: ICause }) => {
                     )}
                 </View>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 };
 
-const CauseList = () => {
-
-    const [userCauses, setUserCauses] = useState<ICause[]>()
-    const { userData } = useUserStore.getState()
-
-    useEffect(() => {
-        const fetchUserCauses = async () => {
-            const response = await fetchUserCausesHandler(userData._id)
-            console.log(response)
-            if (response.success && response.causeData)
-                setUserCauses(response.causeData)
-        }
-        fetchUserCauses()
-    }, [])
-
-    return (
-        <View style={styles.container}>
-            <FlatList
-                data={userCauses}
-                renderItem={({ item }) => <CauseCard cause={item} />}
-                keyExtractor={(item) => item._id!}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.flatList}
-            />
-        </View>
-    );
-};
 
 const styles = StyleSheet.create({
     container: {
@@ -122,5 +103,3 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
 });
-
-export default CauseList;
